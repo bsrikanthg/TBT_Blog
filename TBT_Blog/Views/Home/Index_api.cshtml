@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "TheBuzzTech.com Posts datatable";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2> @ViewBag.Title</h2>
+
+<p>
+    @Html.ActionLink("Create New Post", "CreatePost")
+</p>
+
+<table id="postsTable" class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>PostName</th>
+            <th>PostContent</th>
+            <th>CreatedOn</th>
+            <th>ModifiedOn</th>
+            <th>DeletedOn</th>
+            <th>NewVersionExists</th>
+            <th>RedirectPostId</th>
+            <th>IsHidden</th>
+            <th>HideReason</th>
+            <th>Author Name</th>
+        </tr>
+    </thead>
+
+</table>
+
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+            
+            
+            $.ajax({
+                url: '/api/Posts/',
+                method: 'get',
+                dataType: 'json',
+                success: function (data2) {
+                    $('#postsTable').DataTable({
+                        data: data2,
+                        columns: [
+                            { data: "Id" },
+                            { data: "PostName" },
+                            { data: "PostContent" },
+                            { data: "CreatedOn" },
+                            { data: "ModifiedOn" },
+                            { data: "DeletedOn" },
+                            { data: "NewVersionExists" },
+                            { data: "RedirectPostId" },
+                            { data: "IsHidden" },
+                            { data: "HideReason" },
+                            { data: "Author.Name" }
+                        ]
+                    });
+                }
+            });
+        }
+        );
+    </script>
+
+
+}

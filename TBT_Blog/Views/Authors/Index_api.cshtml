@@ -1,0 +1,82 @@
+﻿
+@{
+    ViewBag.Title = "Index_api";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index_api</h2>
+
+<table id="myTable" class="table">
+    <thead>
+        <tr>
+            <td>Id</td>
+            <td>Name</td>
+            <td>Gender</td>
+            <td>BirthDate</td>
+            <td>Email</td>
+            <td>Mobile</td>
+            <td>Address1</td>
+            <td>City</td>
+            <td>Region</td>
+            <td>Postal Code</td>
+            <td>
+            </td>
+        </tr>
+    </thead>
+
+</table>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var tbl = $('#myTable').DataTable({
+                ajax: {
+                    url: '/api/authors/',
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "Id" },
+                    { data: "Name" },
+                    { data: "Gender" },
+                    { data: "BirthDate" },
+                    { data: "Email" },
+                    { data: "Mobile" },
+                    { data: "Address1" },
+                    { data: "City" },
+                    { data: "Region" },
+                    { data: "PostalCode" },
+                    {
+                        data: "A",
+                        render: function (m, n, a) {
+
+                            return '<a class="btn btn-link delete"  data-hold-name=' + a.Name + ' data-hold-id=' + a.Id + '>DELETE</a>'
+
+                        }
+                    }
+
+                ]
+
+            });
+
+
+            $("#myTable").on('click', '.btn.btn-link.delete', function myfunction() {
+                var btn = $(this);
+                bootbox.confirm("Are you sure you want to delete the author " + btn.attr("data-hold-name") + " ?", function (Accepted) {
+                    if (Accepted) {
+                        $.ajax({
+                            type: "DELETE",
+                            url: "/api/authors/" + btn.attr("data-hold-id"),
+                            success: function (response) {
+                                tbl.row(btn.parents('tr')).remove().draw();
+                               // bootbox.alert("Deleted successfully.");
+                            }
+                        });
+                    }
+                });
+            })
+        }
+        );
+    </script>
+}

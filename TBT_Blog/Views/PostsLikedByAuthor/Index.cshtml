@@ -1,0 +1,89 @@
+﻿@model IEnumerable<TBT_Blog.Models.Post>
+@{
+    /**/
+
+    ViewBag.Title = "Posts Liked By Author";
+}
+
+<h2>Posts Liked By Author</h2>
+<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
+<link href="~/Content/jquery-ui.css" rel="stylesheet" />
+
+
+
+<form action="/SetPostsLiked" id="frm" method="post">
+    <div class="form-group">
+        <label>Author</label>
+        <input type="text" id="AuthorName" name="AuthorName" value="" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Posts</label>
+        <input type="text" id="SearchPost" name="SearchPost" value="" class="form-control" />
+    </div>
+    <button class="btn btn-default">Submit</button>
+    <div class="row">
+
+        <div class="col-md-4 col-sm-4">
+            <ul id="PostsTagged" class="list-group"></ul>
+        </div>
+    </div>
+</form>
+}
+
+<div>
+    @foreach (var x in Model)
+    {
+        <ul>
+            <li>@x.PostName</li>
+        </ul>
+    }
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+
+        $(document).ready(function myfunction() {
+            var VM = {
+                PostsNames: []
+            };
+        $("#AuthorName").autocomplete({
+            source: '@Url.Action("GetAuthors")',
+            minLength: 2
+
+        }).on("autocompleteselect", function (e, ui) {
+            LogVal(ui);
+        });
+
+        $("#SearchPost").autocomplete({
+            source: '@Url.Action("GetPosts")',
+            minLength: 2
+        }).on("autocompleteselect", function (e, Post) {
+            $("#PostsTagged").append("<li class='list-group-item'>" + Post.item.value + "</li>")
+            VM.PostsNames.push(Post.item.value);
+        });
+
+        function LogVal(v) {
+            console.log(v.item.value);
+        }
+
+        $("#frm").submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: "PostsLikedByAuthor/",
+                method: "post",
+                data: VM
+            }).done(function () {
+                console.log("Done.")
+            })
+                .fail(function () {
+                    console.log("NO.")
+
+                });
+        });
+
+        });
+
+      
+    </script>
+}

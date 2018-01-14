@@ -1,0 +1,53 @@
+﻿body {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.42857143;
+    color: #555555;
+    background-color: #ffffff;
+    border: 25px;
+}
+
+.navbar-inverse {
+    background-color: #1268c1;
+    border-color: #7fe8d5;
+}
+
+.break-text p {
+    word-wrap: break-word;
+}
+
+.navbar-brand {
+    float: left;
+    padding: 15px 15px;
+    font-size: 25px;
+    line-height: 20px;
+    height: 50px;
+}
+
+.navbar-inverse .navbar-brand {
+    color: #E8FBFF;
+}
+
+
+.navbar-inverse .navbar-nav > li > a {
+    color: #E8FBFF;
+}
+
+
+.navbar-inverse .navbar-brand:hover, .navbar-inverse .navbar-brand:focus {
+    color: cornsilk;
+    background-color: transparent;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover, .navbar-inverse .navbar-nav > li > a:focus {
+    color: cornsilk;
+    background-color: transparent;
+}
+
+h1, .h1 {
+    font-size: 45px;
+}
+
+h2, .h2 {
+    font-weight: 400;
+}

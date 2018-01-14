@@ -1,0 +1,42 @@
+﻿@model IEnumerable<TBT_Blog.Models.Post>
+
+@{
+    ViewBag.Title = "TheBuzzTech.com";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var numbers = new List<decimal> { 120, 25.66m, -40 };
+
+    foreach (var n in numbers)
+    {
+        AmountFormat(n);
+    }
+}
+
+@helper AmountFormat(decimal money)
+    {
+        string color = "Green";
+        if (money < 0)
+        {
+            color = "Red";
+        }
+        <span style="color:@color">@string.Format("{0:c}", money)</span>
+}
+
+@foreach (var item in Model)
+{
+
+    <h1>
+        <u>@Html.DisplayFor(modelItem => item.PostName)</u>
+    </h1>
+    <div>
+        @Html.Raw(item.PostContent)
+    </div>
+    <div class="dt-body-center">
+        <p>Posted on: @Html.FormatValue(item.CreatedOn, "{0:dd-MMM-yyyy}") by <b>@item.Author.Name</b></p>
+    </div>
+    <div>
+        @Html.DisplayFor(modelItem => item.ModifiedOn)
+    </div>
+}

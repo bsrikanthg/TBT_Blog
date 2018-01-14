@@ -1,0 +1,87 @@
+﻿@model TBT_Blog.Models.PostsViewModel
+
+@{
+    ViewBag.Title = "TheBuzzTech.com";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+@*@helper AmountFormat(decimal money)
+        {
+            string color = "Green";
+            if (money < 0)
+            {
+                color = "Red";
+            }
+            <span style="color:@color">@string.Format("{0:c}", money)</span>
+    }
+
+    @{
+        var numbers = new List<decimal> { 120, 25.66m, -40 };
+        <ol>
+            @foreach (var n in numbers)
+            {
+                <li>
+                    @AmountFormat(n)
+                </li>
+            }
+        </ol>
+    }*@
+<div class="body-content">
+    @if (User.IsInRole(TBT_Blog.Models.RoleNames.CanManagePosts))
+    {
+        <p>
+            @Html.ActionLink("Create New Post", "CreatePost", null, new { @class = "btn btn-default" })
+        </p>
+    }
+    <div class="row">
+        <div class="col-sm-3">
+
+            <ul>
+
+                @foreach (var item in Model.Posts)
+                {
+                    <li class="list-group-item">
+                        @*@Html.ActionLink(item.PostName, "Index", new { postName = item.PostName }, new { Target = "_blank" })*@
+                        <a href="/Posts/@item.PostName">@item.PostName</a>
+                        @if (User.IsInRole(TBT_Blog.Models.RoleNames.CanManagePosts))
+                        {
+                            <span style="color:cornflowerblue">@Html.ActionLink("Edit", "EditPost", new { Id = item.Id }) </span>
+                        }
+                    </li>
+                }
+
+            </ul>
+        </div>
+
+        <div class="col-sm-6">
+
+            <div>
+                <h1>
+                    <b>@Html.DisplayFor(modelItem => Model.SelectedPost.PostName)</b>
+                </h1>
+                @if (User.IsInRole(TBT_Blog.Models.RoleNames.CanManagePosts))
+                {
+                    <span style="color:cornflowerblue">@Html.ActionLink("Edit", "EditPost", new { Id = Model.SelectedPost.Id }) </span>
+                }
+            </div>
+            <div>
+                <p>Posted by <b>@Model.SelectedPost.Author.Name</b></p>
+            </div>
+            <div class="blog-post-post">
+                @Html.Raw(Model.SelectedPost.PostContent)
+            </div>
+
+            <div>
+                @Html.DisplayFor(modelItem => Model.SelectedPost.ModifiedOn)
+            </div>
+            <hr />
+            <hr />
+
+        </div>
+
+        <div class="col-sm-3">
+
+        </div>
+    </div>
+</div>
