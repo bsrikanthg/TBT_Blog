@@ -9,6 +9,9 @@ namespace TBT_Blog
         {
             filters.Add(new HandleErrorAttribute());
             filters.Add(new AuthorizeAttribute());
+
+
+
         }
     }
 }
