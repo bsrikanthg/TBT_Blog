@@ -1,0 +1,111 @@
+﻿@model List<TBT_Blog.Models.ImageList>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<labe>File url:</labe>l
+<label>@ViewBag.FileUrl</label>
+<h2>@ViewBag.Message</h2>
+
+@using (Html.BeginForm("Upload", "FileUpload", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="form-inline">
+            <label>@ViewBag.Message</label>
+            <br />
+            <div class="form-group">
+                <label for="file" class="control-label">Upload Image:</label>
+                <input type="file" name="file" id="file"  multiple class="btn" />
+            </div>
+            <div class="form-group">
+                <input type="submit" id="submit" value="Upload File" class="btn btn-default" />
+            </div>
+        </div>
+    }
+
+@{
+    if (Model.Count != 0)
+    {
+        Html.RenderPartial("_Images", Model);
+    }
+}
+
+@*@using (Ajax.BeginForm("", "", new AjaxOptions()
+{
+    HttpMethod = "POST",
+    LoadingElementId = "divLoading",
+    Confirm = "Upload File?",
+    UpdateTargetId = "divimages",
+    InsertionMode = InsertionMode.Replace
+}))
+{
+    <div class="form-inline">
+        <label>@ViewBag.Message</label>
+        <br />
+        <div class="form-group">
+            <label for="file" class="control-label">Upload Image:</label>
+            <input type="file" name="file" id="file" class="btn" />
+            <input type="file" name="file2" id="file2" class="btn" />
+        </div>
+        <div class="form-group">
+            <input type="submit" id="submit" value="Upload File" class="btn btn-default" />
+        </div>
+    </div>
+    <div id="divimages">
+
+    </div>
+    <div id="divLoading" style="display:none">
+        LOADING....
+    </div>
+
+}*@
+
+
+@*<form method="post"></form>*@
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#submit').click(function () {
+
+            if (window.FormData != undefined) {
+                var fileData = new FormData();
+                var files = $('#file').get(0).files;
+
+                var allFileUploadControls = $(':file')
+                for (var i = 0; i < allFileUploadControls.length; i++) {
+                    var name1 = allFileUploadControls[i].id;
+                    var F = $('#' + name1).get(0).files;
+                    if (F.length != 0) {
+                        fileData.append(F[0].name, F[0]);
+                    }
+                }
+
+                $.ajax({
+                    url: "/FileUpload/Upload",
+                    type: "post",
+                    contentType: false, // Not to set any content header
+                    processData: false, // Not to process data
+                    data: fileData,
+                    success: function Success(result) {
+                        alert("File uploaded succesfully.");
+                    },
+                    error: function Failed(err) {
+                        alert("Failed");
+                    }
+                });
+
+
+            }
+            else {
+                alert("Form data not supported.");
+            }
+        });
+
+
+    });
+
+</script>

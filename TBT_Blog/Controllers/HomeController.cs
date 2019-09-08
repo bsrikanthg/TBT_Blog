@@ -8,15 +8,16 @@ using System.Data.Entity;
 using System.IO;
 using AutoMapper;
 using TBT_Blog.Dtos;
+using System.Threading;
 
 namespace TBT_Blog.Controllers
 {
     public class HomeController : Controller
     {
         int authorId;
-        Post Post;
+        readonly Post Post;
         BlogConnnectionDbContext _context;
-        PostsViewModel postsViewModel = new PostsViewModel();
+        PostWithCategories postWithCategories = new PostWithCategories();
 
 
         public HomeController()
@@ -24,26 +25,34 @@ namespace TBT_Blog.Controllers
             _context = new BlogConnnectionDbContext();
             authorId = _context.Authors.OrderBy(a => a.Id).FirstOrDefault().Id;
             Post = new Post() { AuthorId = authorId, CreatedOn = DateTime.Now };
+            postWithCategories.SinglePost = Post;
+            postWithCategories.Categories = _context.Categories.ToList();
+            postWithCategories.OSs = _context.OSs.ToList();
+            postWithCategories.Posts = _context.Posts.Where(P => P.IsHidden == false).Include(m => m.Author).Include(m => m.Category).Include(m => m.OS).OrderByDescending(P => P.Id).ToList();
+            postWithCategories.ImageList = new List<Image>();
         }
 
         [AllowAnonymous]
-        public ActionResult Index(string postName = "")
+        //        public ActionResult Index(string OS = "", string Category = "", string postName = "")
+        public ActionResult Index()
         {
-            if (postName.Length > 0)
+            if (_context.Posts.Count()==0)
             {
-                postsViewModel.Posts = _context.Posts.Where(P => P.IsHidden == false).Include(m => m.Author).OrderByDescending(P => P.Id).ToList();
-                postsViewModel.SelectedPost = _context.Posts.FirstOrDefault(P => P.PostName == postName);
+                ViewBag.PostType = "Create post";
+                return RedirectToAction("CreatePost");
             }
-            else
+            Post firstPost = new Post();
+
+            firstPost = _context.Posts.Where(P => P.IsHidden == false).FirstOrDefault();
+
+
+            postWithCategories.SinglePost = firstPost;
+            if (_context.Posts.Count() > 0 && firstPost != null)
             {
-                postsViewModel.Posts = _context.Posts.Where(P => P.IsHidden == false).Include(m => m.Author).OrderByDescending(P => P.Id).ToList();
-                postsViewModel.SelectedPost = postsViewModel.Posts.FirstOrDefault();
+                postWithCategories.Posts = _context.Posts.Where(P => P.IsHidden == false && P.Id != firstPost.Id).Include(m => m.Author).OrderByDescending(P => P.Id).ToList();
             }
-            if (User.IsInRole(RoleNames.CanManagePosts))
-            {
-                return View(postsViewModel);
-            }
-            return View(postsViewModel);
+
+            return View(postWithCategories);
         }
 
 
@@ -57,40 +66,58 @@ namespace TBT_Blog.Controllers
         public ActionResult CreatePost()
         {
             ViewBag.PostType = "Create post";
-            return View(Post);
+            return View(postWithCategories);
         }
 
-        public ActionResult Save(Post post)
+        public ActionResult Save(Post singlePost)
         {
+            if (singlePost != null)
+            {
+                singlePost.PostName = singlePost.PostName.Replace(".", "");
+                singlePost.PostContent = PostFixer.AdjustPost(singlePost.PostContent);
+            }
             if (!ModelState.IsValid)
             {
                 return View("CreatePost", Post);
             }
 
-            if (post.Id == 0)
+            if (singlePost.Id == 0)
             {
-                post.PostContent.Replace("<table>", "<table class=\"table\">");
-                _context.Posts.Add(post);
+                singlePost.PostContent.Replace("<table>", "<table class=\"table\">");
+                _context.Posts.Add(singlePost);
                 _context.SaveChanges();
             }
-            else if (post.Id > 0)
+            else if (singlePost.Id > 0)
             {
-                Post postInDb = _context.Posts.SingleOrDefault(P => P.Id == post.Id);
+                Post postInDb = _context.Posts.SingleOrDefault(P => P.Id == singlePost.Id);
 
                 if (postInDb == null)
                 {
                     return View("CreatePost");
                 }
 
-                post.Author = _context.Authors.SingleOrDefault(A => A.Id == authorId);
-                post.CreatedOn = DateTime.Now;
+                singlePost.CreatedOn = DateTime.Now;
 
-                Mapper.Map<Post, Post>(post, postInDb);
+                Mapper.Map<Post, Post>(singlePost, postInDb);
 
                 _context.SaveChanges();
                 return RedirectToAction("Index");
 
             }
+            return RedirectToAction("Index");
+        }
+        public ActionResult DeletePost(int Id)
+        {
+            var post = _context.Posts.SingleOrDefault(P => P.Id == Id);
+            if (post != null)
+            {
+                if (User.IsInRole(RoleNames.CanManagePosts))
+                {
+                    _context.Posts.Remove(post);
+                    _context.SaveChanges();
+                }
+            }
+
             return RedirectToAction("Index");
         }
 
@@ -100,41 +127,73 @@ namespace TBT_Blog.Controllers
             ViewBag.PostType = "Edit post";
             Post post = _context.Posts.SingleOrDefault(P => P.Id == Id);
             post.PostContent = post.PostContent;
+
+            postWithCategories.SinglePost = post;
+            postWithCategories.Categories = _context.Categories.ToList();
+
             if (Post != null)
             {
-                return View("CreatePost", post);
+                return View("CreatePost", postWithCategories);
             }
 
             return View("CreatePost");
         }
-        public PartialViewResult Upload(HttpPostedFileBase file)
+
+        public int Work()
         {
-            if (file != null && file.ContentLength > 0)
-            {
-                try
-                {
-                    if (!Directory.Exists(Server.MapPath("~/Media/")))
-                    {
-                        Directory.CreateDirectory(Server.MapPath("~/Media/"));
-                    }
-                    string path = Path.Combine(Server.MapPath("~/Media/"), Path.GetFileName(file.FileName));
-                    file.SaveAs(path);
-                    ViewBag.Message = "File path on the server: " + "/Media/" + file.FileName;
-                }
-                catch
-                {
-                    ViewBag.Message = "File upload not successful";
-                }
-            }
-            else
-            {
-                ViewBag.Message = "File not specified.";
-            }
-
-
-            Post Post = new Post() { AuthorId = authorId, CreatedOn = DateTime.Now };
-            return PartialView("CreatePost", Post);
+            Thread.Sleep(1500);
+            return DateTime.Now.Second;
         }
+        public string GetLongTime()
+        {
+            System.Threading.Thread.Sleep(5000);
+
+            return "Time: " + DateTime.Now.ToLongDateString();
+        }
+        public PartialViewResult Upload()
+        {
+            try
+            {
+                string serverFolder = Server.MapPath("~/Media");
+                if (!Directory.Exists(serverFolder))
+                {
+                    Directory.CreateDirectory(serverFolder);
+                }
+
+                if (Request.Files.Count > 0)
+                {
+
+                    for (int i = 0; i < Request.Files.Count; i++)
+                    {
+                        HttpPostedFileBase file = Request.Files[i];
+                        file.SaveAs(serverFolder + "\\" + file.FileName);
+                        ImgList.Add(new Models.Image() { ImageUrl = "/Media/" + file.FileName, Name = file.FileName });
+                    }
+                    ViewBag.Message = "Files uploaded successfully.";
+
+
+                }
+                else
+                {
+                    ViewBag.Message = "No files.";
+                }
+
+
+                return PartialView("_FileUpload", ImgList);
+
+            }
+            catch (Exception ex)
+            {
+                WebsiteExceptions websiteExceptions = new WebsiteExceptions();
+                _context.WebsiteExceptions.Add(new WebsiteExceptions { Source = ex.Source, Message = ex.Message, InnerException = ex.InnerException.Message, TargetSite = ex.TargetSite.Name });
+                _context.SaveChanges();
+                ViewBag.Message = "File upload not successful, Exception: " + ex.Message + "\n Inner Exception" + ex.InnerException.Message + "\nSource: " + ex.Source;
+                return PartialView("Error");
+            }
+
+
+        }
+        List<Models.Image> ImgList = new List<Models.Image>();
 
         public ActionResult Serial(string letterCase)
         {

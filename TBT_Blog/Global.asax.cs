@@ -11,7 +11,7 @@ using TBT_Blog.App_Start;
 
 namespace TBT_Blog
 {
-    public class WebApiApplication : System.Web.HttpApplication
+    public class WebApiApplication : HttpApplication
     {
         protected void Application_Start()
         {

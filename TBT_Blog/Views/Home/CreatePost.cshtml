@@ -1,126 +1,198 @@
-﻿@model TBT_Blog.Models.Post
+﻿@model TBT_Blog.Models.PostWithCategories
 
 @{
+    /**/
+
     ViewBag.Title = "Create Post";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <h1>@ViewBag.PostType</h1>
-
-<script src="~/Scripts/jquery-3.1.1.min.js"></script>
-<script src="~/Scripts/jquery-ui-1.12.1.js"></script>
-<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
 <script src="~/Scripts/tinymce/js/tinymce/tinymce.min.js"></script>
 <script type="text/javascript">
 
-    tinymce.init({
-        selector: '#PostContent',
-        height: 500,
-        theme: 'modern',
-        plugins: [
-            'advlist autolink lists link image charmap print preview hr anchor pagebreak',
-            'searchreplace wordcount visualblocks visualchars code fullscreen',
-            'insertdatetime media nonbreaking save table contextmenu directionality',
-            'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'
-        ],
-        toolbar1: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
-        toolbar2: 'print preview media | forecolor backcolor emoticons | codesample',
-        image_advtab: true,
-        templates: [
-            { title: 'Test template 1', content: 'Test 1' },
-            { title: 'Test template 2', content: 'Test 2' }
-        ],
-        content_css: [
-            //'//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
-            //'//www.tinymce.com/css/codepen.min.css'
-            '/Content/bootstrap.min.css'
+    $(document).ready(function () {
+        tinymce.init({
+            selector: '#SinglePost_PostContent',
+            height: 500,
+            theme: 'modern',
+            plugins: [
+                'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+                'searchreplace wordcount visualblocks visualchars code fullscreen',
+                'insertdatetime media nonbreaking save table contextmenu directionality',
+                'emoticons template paste textcolor colorpicker textpattern imagetools codesample toc'
+            ],
+            toolbar1: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+            toolbar2: 'print preview media | forecolor backcolor emoticons | codesample',
+            image_advtab: true,
+            templates: [
+                { title: 'Test template 1', content: 'Test 1' },
+                { title: 'Test template 2', content: 'Test 2' }
+            ],
+            content_css: [
+                //'//fonts.googleapis.com/css?family=Lato:300,300i,400,400i',
+                //'//www.tinymce.com/css/codepen.min.css'
+                '/Content/bootstrap.min.css'
 
 
-        ]
+            ]
+        });
+
+
     });
 
+
+
 </script>
-@using (Html.BeginForm("Upload", "Home", sFormMethod.Post, new { enctype = "multipart/form-data" }))
+
+
+@using (Ajax.BeginForm("", "", new AjaxOptions
 {
-    @Html.Partial("_FileUpload")
+}))
+{
+
+    <label>@ViewBag.Message</label>
+    <br />
+    <div class="form-group">
+        <label for="file" class="control-label">Upload Image:</label>
+        <input type="file" required name="file" multiple id="file" class="btn" />
+        
+    </div>
+    <div class="form-group">
+        <input type="submit" id="fileuploadSubmit" value="Upload File" class="btn btn-default" />
+    </div>
+    <div id="divimages">
+
+    </div>
 }
-<div id="PV">
 
 
-</div>
+
+
+@using (Ajax.BeginForm("Work", "Home", new AjaxOptions
+{
+    HttpMethod = "Get",
+    UpdateTargetId = "WR",
+    InsertionMode = InsertionMode.Replace
+}))
+{
+
+    <div class="form-group">
+        <input type="submit" id="S" value="GetTime" class="btn btn-default" />
+    </div>
+    <div id="WR">
+
+    </div>
+}
+
+@*@using (Ajax.BeginForm("Upload", "Home", new AjaxOptions()
+    {
+        HttpMethod = "POST",
+        LoadingElementId = "divLoading",
+        UpdateTargetId = "divimages",
+        InsertionMode = InsertionMode.Replace
+    }, new { enctype = "multipart/form-data" }))
+    {
+        <div id="divLoading" class="form-control" style="display:none">
+            Loading....
+        </div>
+        <div class="form-inline">
+            <label>@ViewBag.Message</label>
+            <br />
+            <div class="form-group">
+                <label for="file" class="control-label">Upload Image:</label>
+                <input type="file" name="file" id="file" class="btn" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Upload File" class="btn btn-default" />
+            </div>
+        </div>
+
+    }*@
+
+
 
 @using (Html.BeginForm("Save", "Home"))
 {
     @Html.AntiForgeryToken()
-<div class="form-horizontal">
-    <h4>Create Post</h4>
-    <hr />
-    @Html.HiddenFor(model => model.AuthorId)
-    @Html.HiddenFor(model => model.Id)
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-    <div class="form-group">
-        @Html.LabelFor(model => model.PostName, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.PostName, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.PostName, "", new { @class = "text-danger" })
+    <div class="form-horizontal">
+        <h4>Create Post</h4>
+        <hr />
+        @Html.HiddenFor(model => model.SinglePost.AuthorId)
+        @Html.HiddenFor(model => model.SinglePost.Id)
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.SinglePost.PostName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.SinglePost.PostName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.SinglePost.PostName, "", new { @class = "text-danger" })
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.PostContent, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.PostContent, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.PostContent, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.SinglePost.PostContent, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.SinglePost.PostContent, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.SinglePost.PostContent, "", new { @class = "text-danger" })
+            </div>
         </div>
-    </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.OSs, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SinglePost.OSId, new SelectList(Model.OSs, "Id", "OperatingSystem"), "None", new { @class = "form-control" })
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.CreatedOn, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.CreatedOn, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.CreatedOn, "", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(model => model.OSs.First().Id, "", new { @class = "text-danger" })
+            </div>
         </div>
-    </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Categories, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.SinglePost.CategoryId, new SelectList(Model.Categories, "Id", "CategoryName"), "None", new { @class = "form-control" })
+
+                @Html.ValidationMessageFor(model => model.Categories.First().Id, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SinglePost.CreatedOn, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.SinglePost.CreatedOn, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.SinglePost.CreatedOn, "", new { @class = "text-danger" })
+            </div>
+        </div>
 
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.NewVersionExists, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            <div class="checkbox">
-                @Html.EditorFor(model => model.NewVersionExists)
-                @Html.ValidationMessageFor(model => model.NewVersionExists, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.SinglePost.NewVersionExists, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="checkbox">
+                    @Html.EditorFor(model => model.SinglePost.NewVersionExists)
+                    @Html.ValidationMessageFor(model => model.SinglePost.NewVersionExists, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SinglePost.IsHidden, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.SinglePost.IsHidden, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SinglePost.HideReason, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.SinglePost.HideReason, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.SinglePost.HideReason, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
             </div>
         </div>
     </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.RedirectPostId, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.RedirectPostId, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.RedirectPostId, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.IsHidden, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.IsHidden, new { htmlAttributes = new { @class = "form-control" } })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.HideReason, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.HideReason, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.HideReason, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Create" class="btn btn-default" />
-        </div>
-    </div>
-</div>
 }
 
 <div>
@@ -129,4 +201,50 @@
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#fileuploadSubmit').click(function () {
+
+                if (window.FormData != undefined) {
+                    var fileData = new FormData();
+                    var files = $('#file').get(0).files;
+
+                    var allFileUploadControls = $(':file')
+                    for (var i = 0; i < allFileUploadControls.length; i++) {
+                        var name1 = allFileUploadControls[i].id;
+                        var F = $('#' + name1).get(0).files;
+                        if (F.length != 0) {
+                            for (var i = 0; i < F.length; i++) {
+                                fileData.append(F[i].name, F[i]);
+                            }
+                        }
+                    }
+
+                    $.ajax({
+                        url: "/Home/Upload",
+                        type: "post",
+                        contentType: false, // Not to set any content header
+                        processData: false, // Not to process data
+                        data: fileData,
+                        success: function Success(result) {
+                            $("#divimages").html(result);
+                        },
+                        error: function Failed(err) {
+                            alert("Failed");
+                        }
+                    });
+
+
+                }
+                else {
+                    alert("Form data not supported.");
+                }
+            });
+
+
+        });
+
+    </script>
 }

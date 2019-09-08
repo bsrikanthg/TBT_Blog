@@ -1,0 +1,69 @@
+﻿@model TBT_Blog.Models.ViewModels.BlogPostData
+
+@{
+    ViewBag.Title = "TheBuzzTech.com";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    var otherCategories = Model.AllCategoryList.Where(C => C.Id != Model.SimilarPosts.First().CategoryId).ToList();
+    var thisCategory = Model.AllCategoryList.Where(C => C.Id == Model.SimilarPosts.First().CategoryId).First().CategoryName;
+    var OSname = Model.AllCategoryList.Where(C => C.Id == Model.SimilarPosts.First().CategoryId).First().CategoryOS;
+
+}
+
+<div class="body-content">
+
+    <div class="row">
+        <div class="col-sm-3">
+            <h5>Other categories:</h5>
+            @if (Model.SimilarPosts.Count > 0)
+            {
+                @Html.Partial("_Categories", otherCategories);
+            }
+            else
+            {
+                <h1>No posts in this category.</h1>
+            }
+
+        </div>
+
+        <div class="col-sm-6">
+            @if (Model.SimilarPosts.Count > 0)
+            {
+                <a href="/Posts/@OSname">@OSname</a>
+                <b>></b>@thisCategory
+
+            }
+            @foreach (var postItem in Model.SimilarPosts)
+            {
+                <div>
+                    <h1>
+                        <b>@Html.DisplayFor(modelItem => postItem.PostName)</b>
+                    </h1>
+                    @if (User.IsInRole(TBT_Blog.Models.RoleNames.CanManagePosts))
+                    {
+                        <span style="color:cornflowerblue">@Html.ActionLink("Edit", "EditPost", "Home", new { Id = postItem.Id }, null) </span>
+                        <span style="color:cornflowerblue">@Html.ActionLink("Delete", "DeletePost", "Home", new { Id = postItem.Id }, null) </span>
+                    }
+                </div>
+                <div>
+                    <p>Posted by <b>@postItem.Author.Name</b></p>
+                </div>
+
+                <div class="blog-post-post">
+                    @Html.Raw(postItem.PostContent)
+                </div>
+
+                <div>
+                    @Html.DisplayFor(modelItem => postItem.ModifiedOn)
+                </div>
+                <hr />
+            }
+        </div>
+
+        <div class="col-sm-3">
+
+        </div>
+    </div>
+</div>

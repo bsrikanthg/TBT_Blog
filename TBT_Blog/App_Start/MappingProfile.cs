@@ -26,7 +26,8 @@ namespace TBT_Blog.App_Start
         public MapProf()
         {
             CreateMap<Post, PostDto>();
-            CreateMap<Post, Post>();
+            CreateMap<Post, Post>().ForMember(P => P.Category, memOpt => memOpt.Ignore()).ForMember(P => P.Author, memOpt => memOpt.Ignore()).
+                ForMember(P => P.OS, memOpt => memOpt.Ignore());
             CreateMap<PostDto, Post>();
             CreateMap<Author, AuthorDto>();
             CreateMap<Author, Author>();
@@ -35,6 +36,12 @@ namespace TBT_Blog.App_Start
             CreateMap<AuthorLikedPost, AuthorLikedPostDto>();
         }
 
-        //protected override void Configure()        //{        //    //For A.M 4.x:        //    CreateMap<StudentDto, Student>();        //    CreateMap<Student, StudentDto>();        //}
+        //protected override void Configure()
+        //{
+        //    //For A.M 4.x:
+        //    CreateMap<StudentDto, Student>();
+        //    CreateMap<Student, StudentDto>();
+        //}
+
     }
 }

@@ -37,6 +37,10 @@ namespace TBT_Blog.Models
         public DbSet<Commenter> Commenters { get; set; }
 
         public DbSet<AuthorLikedPost> AuthorLikedPosts { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<WebsiteExceptions> WebsiteExceptions { get; set; }
+        public DbSet<OS> OSs { get; set; }
+
         public static BlogConnnectionDbContext Create()
         {
             return new BlogConnnectionDbContext();

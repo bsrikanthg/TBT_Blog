@@ -7,6 +7,15 @@
     @Scripts.Render("~/bundles/JSlib")
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-102028776-1"></script>
+
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-102028776-1');
+    </script>
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -21,8 +30,8 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, null)</li>
-                    <li>@Html.ActionLink("Authors", "Index", "Authors", new { area = "" }, null)</li>
+                    @*<li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("Authors", "Index", "Authors", new { area = "" }, null)</li>*@
                     @*<li>@Html.ActionLink("API", "Index", "Help", new { area = "" }, null)</li>*@
                 </ul>
                 @*@Html.Partial("_LoginPartial")*@

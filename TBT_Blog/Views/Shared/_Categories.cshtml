@@ -1,0 +1,11 @@
+﻿@model IEnumerable<TBT_Blog.Models.Category>
+
+<ul>
+    @foreach (var item in Model)
+    {
+        <li class="list-group-item">
+            <a href="/Posts/@item.CategoryOS/@item.CategoryName">@item.CategoryName</a>
+        </li>
+    }
+</ul>
+
